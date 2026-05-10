@@ -1,0 +1,156 @@
+date,day_of_week,hour,category,merchant,amount,type,balance
+2026-02-01,Sunday,9,Savings,Salary Credit,15000.0,credit,30000.0
+2026-02-01,Sunday,10,Rent,Room Rent,5918.28,debit,24081.72
+2026-02-02,Monday,9,Food,Dominos,258.54,debit,21107.79
+2026-02-03,Tuesday,16,Food,Swiggy,139.03,debit,23328.52
+2026-02-03,Tuesday,11,Food,Zomato,310.94,debit,20796.85
+2026-02-03,Tuesday,9,Food,McDonald's,229.05,debit,21498.25
+2026-02-04,Wednesday,18,Food,Zomato,105.04,debit,22241.55
+2026-02-05,Thursday,16,Transport,Auto,64.39,debit,19122.25
+2026-02-05,Thursday,15,Education,Udemy,686.09,debit,13734.88
+2026-02-05,Thursday,16,Food,McDonald's,138.13,debit,22346.59
+2026-02-06,Friday,11,Transport,Bus Pass,103.21,debit,20063.31
+2026-02-06,Friday,8,Transport,Uber,116.15,debit,20166.52
+2026-02-06,Friday,13,Food,Tea Stall,179.95,debit,20461.85
+2026-02-06,Friday,11,Transport,Rapido,162.57,debit,18502.73
+2026-02-07,Saturday,16,Transport,Rapido,137.98,debit,19289.23
+2026-02-08,Sunday,8,Food,Dominos,201.29,debit,22993.54
+2026-02-08,Sunday,12,Food,Zomato,140.27,debit,23941.45
+2026-02-08,Sunday,19,Transport,Bus Pass,167.92,debit,19673.15
+2026-02-09,Monday,11,Transport,Petrol Pump,146.33,debit,20315.52
+2026-02-11,Wednesday,3,Entertainment,Gaming,155.78,debit,16650.03
+2026-02-12,Thursday,2,Food,Dominos,308.82,debit,21932.73
+2026-02-12,Thursday,21,Transport,Uber,59.48,debit,18813.87
+2026-02-13,Friday,15,Food,McDonald's,155.05,debit,20641.8
+2026-02-13,Friday,9,Transport,Uber,68.19,debit,19604.96
+2026-02-14,Saturday,6,Transport,Rapido,181.61,debit,18873.35
+2026-02-15,Sunday,20,Shopping,Meesho,305.52,debit,16344.51
+2026-02-17,Tuesday,17,Utilities,Airtel,656.31,debit,14940.44
+2026-02-17,Tuesday,22,Transport,Ola,108.83,debit,18705.04
+2026-02-18,Wednesday,14,Entertainment,Pub,475.44,debit,16805.81
+2026-02-18,Wednesday,8,Transport,Auto,67.29,debit,19054.96
+2026-02-18,Wednesday,13,Entertainment,BookMyShow,530.39,debit,17741.61
+2026-02-18,Wednesday,8,Food,Mess,133.69,debit,23194.83
+2026-02-18,Wednesday,19,Food,Mess,113.7,debit,21727.3
+2026-02-19,Thursday,9,Food,Zomato,131.92,debit,21366.33
+2026-02-19,Thursday,15,Transport,Bus Pass,177.75,debit,19427.21
+2026-02-19,Thursday,18,Food,Swiggy,193.92,debit,23467.55
+2026-02-20,Friday,7,Transport,Rapido,31.43,debit,18471.3
+2026-02-20,Friday,15,Health,Apollo Pharmacy,326.91,debit,13407.97
+2026-02-20,Friday,18,Transport,Auto,199.3,debit,18272.0
+2026-02-21,Saturday,4,Transport,Bus Pass,102.59,debit,19186.64
+2026-02-21,Saturday,17,Transport,Petrol Pump,32.85,debit,20282.67
+2026-02-21,Saturday,12,Transport,Uber,143.87,debit,19919.44
+2026-02-22,Sunday,7,Entertainment,Pub,460.36,debit,17281.25
+2026-02-22,Sunday,14,Transport,Ola,78.37,debit,19841.07
+2026-02-22,Sunday,22,Food,Zomato,279.98,debit,23661.47
+2026-02-23,Monday,20,Food,Dominos,194.11,debit,22484.72
+2026-02-24,Tuesday,10,Shopping,Reliance Trends,747.76,debit,15596.75
+2026-02-26,Thursday,5,Food,Canteen,314.71,debit,22678.83
+2026-02-26,Thursday,22,Food,Chai Point,91.73,debit,21841.0
+2026-02-27,Friday,11,Utilities,Water Bill,519.47,debit,14420.97
+2026-02-28,Saturday,20,Savings,Piggy Bank,667.8,credit,14075.77
+2026-02-28,Saturday,19,Transport,Petrol Pump,39.74,debit,18665.3
+2026-03-01,Sunday,9,Savings,Salary Credit,15000.0,credit,29075.77
+2026-03-01,Sunday,10,Rent,PG Payment,6636.17,debit,22439.6
+2026-03-02,Monday,9,Food,Zomato,145.04,debit,22294.56
+2026-03-02,Monday,17,Shopping,D-Mart,385.24,debit,14654.89
+2026-03-02,Monday,6,Transport,Petrol Pump,141.21,debit,18346.33
+2026-03-03,Tuesday,10,Food,McDonald's,324.46,debit,19741.33
+2026-03-03,Tuesday,22,Food,Zomato,277.62,debit,22016.94
+2026-03-03,Tuesday,19,Food,Dominos,218.82,debit,19522.51
+2026-03-03,Tuesday,18,Utilities,JIO Recharge,537.61,debit,11564.71
+2026-03-04,Wednesday,9,Food,Zomato,146.93,debit,20541.33
+2026-03-04,Wednesday,18,Transport,Auto,29.11,debit,17753.77
+2026-03-04,Wednesday,23,Transport,Petrol Pump,30.91,debit,18315.42
+2026-03-04,Wednesday,19,Education,Stationery,1424.07,debit,10140.64
+2026-03-05,Thursday,21,Food,Canteen,258.13,debit,21534.98
+2026-03-06,Friday,20,Transport,Rapido,88.22,debit,17218.46
+2026-03-06,Friday,12,Transport,Rapido,93.15,debit,17482.32
+2026-03-06,Friday,14,Shopping,Reliance Trends,396.7,debit,12395.23
+2026-03-07,Saturday,11,Entertainment,Cafe,584.35,debit,15443.76
+2026-03-07,Saturday,8,Food,Mess,105.47,debit,18581.54
+2026-03-07,Saturday,7,Transport,Ola,175.64,debit,17306.68
+2026-03-08,Sunday,15,Food,Mess,291.85,debit,18687.01
+2026-03-08,Sunday,16,Education,Coursera,952.59,debit,9188.05
+2026-03-08,Sunday,9,Transport,Auto,54.49,debit,18096.82
+2026-03-09,Monday,17,Transport,Rapido,186.77,debit,17031.69
+2026-03-09,Monday,19,Transport,Ola,103.27,debit,17948.32
+2026-03-09,Monday,20,Food,Mess,222.47,debit,21312.51
+2026-03-11,Wednesday,4,Food,Tea Stall,85.68,debit,20455.65
+2026-03-11,Wednesday,19,Transport,Ola,164.11,debit,18151.31
+2026-03-14,Saturday,12,Entertainment,Pub,448.3,debit,16583.39
+2026-03-14,Saturday,19,Transport,Petrol Pump,94.0,debit,18487.54
+2026-03-14,Saturday,19,Health,Yoga Class,560.16,debit,8627.89
+2026-03-15,Sunday,0,Transport,Uber,45.23,debit,18051.59
+2026-03-15,Sunday,18,Transport,Auto,165.44,debit,17782.88
+2026-03-15,Sunday,6,Food,Chai Point,322.9,debit,20688.26
+2026-03-16,Monday,11,Entertainment,Spotify,177.4,debit,16028.11
+2026-03-17,Tuesday,20,Shopping,Reliance Trends,1862.96,debit,12791.93
+2026-03-18,Wednesday,18,Shopping,Myntra,403.63,debit,15040.13
+2026-03-19,Thursday,11,Food,Zomato,139.46,debit,20316.19
+2026-03-22,Sunday,12,Food,Canteen,211.06,debit,19311.45
+2026-03-23,Monday,12,Food,Tea Stall,250.4,debit,20065.79
+2026-03-23,Monday,21,Food,McDonald's,164.16,debit,21011.16
+2026-03-24,Tuesday,11,Food,Chai Point,332.59,debit,18978.86
+2026-03-25,Wednesday,19,Food,Canteen,223.83,debit,21793.11
+2026-03-26,Thursday,6,Entertainment,Pub,377.88,debit,16205.51
+2026-03-27,Friday,19,Transport,Ola,22.66,debit,17731.11
+2026-03-28,Saturday,7,Utilities,Water Bill,292.91,debit,12102.32
+2026-03-30,Monday,6,Transport,Uber,155.64,debit,17575.47
+2026-03-31,Tuesday,16,Food,Tea Stall,137.19,debit,21175.32
+2026-03-31,Tuesday,20,Savings,Piggy Bank,1284.17,credit,9912.06
+2026-04-01,Wednesday,11,Education,Stationery,875.9,debit,2923.11
+2026-04-01,Wednesday,9,Savings,Salary Credit,15000.0,credit,24912.06
+2026-04-01,Wednesday,10,Rent,Hostel Fee,4612.78,debit,20299.28
+2026-04-01,Wednesday,12,Entertainment,Gaming,430.02,debit,13488.72
+2026-04-01,Wednesday,20,Transport,Petrol Pump,40.14,debit,15574.35
+2026-04-01,Wednesday,2,Food,Zomato,203.74,debit,19358.7
+2026-04-02,Thursday,21,Food,Canteen,80.96,debit,16158.34
+2026-04-03,Friday,8,Food,Dominos,251.26,debit,16239.3
+2026-04-03,Friday,7,Food,Dominos,225.16,debit,19133.54
+2026-04-04,Saturday,22,Utilities,Airtel,498.29,debit,5273.7
+2026-04-05,Sunday,20,Transport,Ola,97.36,debit,15343.7
+2026-04-05,Sunday,3,Food,Zomato,331.98,debit,18801.56
+2026-04-06,Monday,11,Food,Dominos,198.31,debit,18457.29
+2026-04-07,Tuesday,11,Education,College Fee,531.14,debit,3799.01
+2026-04-07,Tuesday,6,Food,Dominos,265.62,debit,16702.46
+2026-04-08,Wednesday,9,Transport,Rapido,55.92,debit,13993.67
+2026-04-08,Wednesday,14,Food,Canteen,151.72,debit,20147.56
+2026-04-08,Wednesday,20,Transport,Bus Pass,140.05,debit,15033.6
+2026-04-09,Thursday,13,Food,Zomato,111.17,debit,17440.75
+2026-04-10,Friday,9,Food,McDonald's,243.3,debit,16968.08
+2026-04-10,Friday,15,Transport,Ola,85.64,debit,15258.06
+2026-04-11,Saturday,13,Food,Zomato,330.83,debit,19562.44
+2026-04-11,Saturday,21,Entertainment,BookMyShow,239.3,debit,13249.42
+2026-04-11,Saturday,18,Shopping,Flipkart,1896.7,debit,9657.98
+2026-04-12,Sunday,7,Transport,Uber,74.93,debit,13918.74
+2026-04-12,Sunday,3,Health,Doctor,401.91,debit,2521.2
+2026-04-13,Monday,15,Shopping,Reliance Trends,1455.18,debit,11554.68
+2026-04-17,Friday,11,Food,Swiggy,211.9,debit,16490.56
+2026-04-17,Friday,14,Education,Stationery,350.34,debit,4330.15
+2026-04-19,Sunday,22,Shopping,Myntra,1936.31,debit,5771.99
+2026-04-20,Monday,7,Transport,Uber,154.91,debit,14757.91
+2026-04-20,Monday,15,Food,Swiggy,345.64,debit,18111.65
+2026-04-21,Tuesday,19,Food,Canteen,344.55,debit,15813.79
+2026-04-22,Wednesday,20,Food,Dominos,300.62,debit,17811.03
+2026-04-22,Wednesday,15,Food,Chai Point,254.29,debit,19893.27
+2026-04-24,Friday,17,Food,Mess,199.3,debit,15614.49
+2026-04-24,Friday,19,Transport,Rapido,186.41,debit,14428.04
+2026-04-24,Friday,18,Food,Dominos,229.37,debit,17211.38
+2026-04-24,Friday,10,Utilities,Wi-Fi,593.21,debit,4680.49
+2026-04-25,Saturday,11,Transport,Rapido,120.78,debit,14912.82
+2026-04-25,Saturday,11,Entertainment,Pub,239.56,debit,13009.86
+2026-04-26,Sunday,0,Transport,Uber,64.67,debit,14222.79
+2026-04-26,Sunday,15,Transport,Rapido,146.23,debit,14076.56
+2026-04-26,Sunday,20,Transport,Petrol Pump,140.58,debit,14287.46
+2026-04-27,Monday,9,Transport,Auto,86.46,debit,15441.06
+2026-04-28,Tuesday,13,Transport,Rapido,26.97,debit,14049.59
+2026-04-28,Tuesday,9,Transport,Uber,49.25,debit,14708.66
+2026-04-29,Wednesday,17,Food,Dominos,145.96,debit,18655.6
+2026-04-29,Wednesday,13,Transport,Uber,94.21,debit,14614.45
+2026-04-29,Wednesday,19,Transport,Petrol Pump,84.41,debit,15173.65
+2026-04-29,Wednesday,19,Transport,Ola,46.83,debit,15527.52
+2026-04-29,Wednesday,12,Shopping,Amazon,1949.68,debit,7708.3
+2026-04-30,Thursday,10,Food,Canteen,259.11,debit,17551.92
+2026-04-30,Thursday,20,Savings,GPay Savings,1434.73,credit,3955.93

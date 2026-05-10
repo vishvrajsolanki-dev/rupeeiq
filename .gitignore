@@ -17,9 +17,6 @@ venv/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data — keep sample CSV out of repo (regenerate on first run)
-data/sample_transactions.csv
-
 # Dev/test files
 test_utils.py
 assets/style.css

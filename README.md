@@ -123,7 +123,7 @@ rupeeiq/
 
 ## Deployment
 
-Live on Streamlit Cloud: *[link after deploy]*
+Live on Streamlit Cloud: **https://rupeeiq-sjphk5ivzblxabz4uxbdvv.streamlit.app**
 
 ---
 
