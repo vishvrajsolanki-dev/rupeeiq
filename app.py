@@ -20,9 +20,11 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── SESSION STATE ─────────────────────────────────────────────
-if "page" not in st.session_state:
-    st.session_state.page = "HOME"
+# ── SESSION STATE DEFAULTS ────────────────────────────────────
+if "page"           not in st.session_state: st.session_state.page           = "HOME"
+if "file_bytes"     not in st.session_state: st.session_state.file_bytes     = None
+if "file_name"      not in st.session_state: st.session_state.file_name      = None
+if "analysis"       not in st.session_state: st.session_state.analysis       = None
 
 # ── GLOBAL CSS ───────────────────────────────────────────────
 st.markdown("""
@@ -87,20 +89,23 @@ html, body, .stApp,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] div { color: var(--text) !important; }
 
-/* FIX: iframes must not capture clicks — let them pass to st.button */
+/* FIX: iframes must not capture clicks */
 [data-testid="stSidebar"] iframe { pointer-events: none !important; }
 
-/* ── NAV BUTTONS (hidden label, full-width click area) ───── */
+/* ── NAV BUTTONS — invisible click layer over visual cards ── */
 [data-testid="stSidebar"] [data-testid="stButton"] > button {
     width: 100% !important;
     background: transparent !important;
     border: none !important;
     opacity: 0 !important;
-    height: 1px !important;
+    height: 52px !important;
     min-height: 0 !important;
     padding: 0 !important;
-    margin: -4px 0 4px !important;
-    overflow: hidden !important;
+    margin: 0 !important;
+    position: relative !important;
+    top: -52px !important;
+    margin-bottom: -52px !important;
+    z-index: 999 !important;
     cursor: pointer !important;
 }
 
@@ -254,8 +259,7 @@ with st.sidebar:
         components.html(f"""
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
         <div style="background:{bg};border:1px solid {border};border-left:3px solid {border};
-                    border-radius:6px;padding:0.65rem 0.85rem;pointer-events:none;
-                    margin-bottom:2px;">
+                    border-radius:6px;padding:0.65rem 0.85rem;pointer-events:none;margin-bottom:2px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="display:flex;align-items:center;gap:0.5rem;">
                     <span style="font-size:0.9rem;">{icon}</span>
@@ -286,7 +290,17 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
+    # ── FILE UPLOADER — store BYTES immediately, not the file object ──
+    # Bytes survive page reruns; file objects do not.
     uploaded_file = st.file_uploader("", type=["csv"], label_visibility="collapsed")
+
+    if uploaded_file is not None:
+        new_bytes = uploaded_file.getvalue()
+        new_name  = uploaded_file.name
+        if new_name != st.session_state.file_name:
+            st.session_state.file_bytes = new_bytes
+            st.session_state.file_name  = new_name
+            st.session_state.analysis   = None
 
     try:
         with open("data/sample_transactions.csv", "rb") as f:
@@ -312,10 +326,96 @@ with st.sidebar:
 
 
 # ── CURRENT PAGE ──────────────────────────────────────────────
-page = st.session_state.page
+page         = st.session_state.page
+has_file     = st.session_state.file_bytes is not None
+has_analysis = st.session_state.analysis   is not None
 
 
-# ── UPLOAD PROMPT (per-module empty state) ────────────────────
+# ── CACHED ANALYSIS ───────────────────────────────────────────
+@st.cache_data(show_spinner=False)
+def run_analysis(file_bytes, filename):
+    file_obj         = io.BytesIO(file_bytes)
+    file_obj.name    = filename
+    df, error        = load_csv(file_obj)
+    if error:
+        return None, error
+    df               = preprocess(df)
+    spending_profile = get_spending_profile(df)
+    personality      = get_personality(spending_profile)
+    daily_df         = get_daily_spending(df)
+    summary          = get_summary(df)
+    current_balance  = float(df["balance"].iloc[-1])
+    crisis           = predict_crisis(daily_df, current_balance)
+    story            = get_story(df, spending_profile, crisis, personality["name"])
+    return {
+        "spending_profile": spending_profile,
+        "personality":      personality,
+        "crisis":           crisis,
+        "story":            story,
+        "summary":          summary,
+        "current_balance":  current_balance,
+    }, None
+
+
+# ── RUN ANALYSIS ONCE — results live in session_state.analysis ─
+if has_file and not has_analysis:
+    progress_bar = st.progress(0)
+    status       = st.empty()
+
+    def set_status(pct, msg):
+        progress_bar.progress(pct)
+        status.markdown(
+            f"<div style='font-family:IBM Plex Mono,monospace;font-size:0.68rem;"
+            f"color:#7A9AAA;letter-spacing:2px;padding:0.2rem 0;'>"
+            f"<span style='color:#C8FF00;'>▶</span>&nbsp;{msg}</div>",
+            unsafe_allow_html=True
+        )
+
+    set_status(20, "LOADING & PREPROCESSING...")
+    time.sleep(0.1)
+    set_status(55, "RUNNING ALL 3 MODULES...")
+
+    results, error = run_analysis(
+        st.session_state.file_bytes,
+        st.session_state.file_name
+    )
+
+    if error:
+        st.error(f"❌ {error}")
+        st.stop()
+
+    st.session_state.analysis = results
+    has_analysis = True
+
+    set_status(100, "ANALYSIS COMPLETE")
+    time.sleep(0.25)
+    progress_bar.empty()
+    status.empty()
+
+
+# ── HELPERS ───────────────────────────────────────────────────
+def dark_chart(fig):
+    fig.update_layout(
+        paper_bgcolor="#05080A", plot_bgcolor="#0B0F13",
+        font=dict(family="IBM Plex Mono, monospace", color="#7A9AAA", size=10),
+        xaxis=dict(gridcolor="#182028", zerolinecolor="#182028",
+                   tickfont=dict(color="#7A9AAA"), linecolor="#182028"),
+        yaxis=dict(gridcolor="#182028", zerolinecolor="#182028",
+                   tickfont=dict(color="#7A9AAA"), linecolor="#182028"),
+        margin=dict(l=40, r=20, t=45, b=35),
+        title_font=dict(family="IBM Plex Mono, monospace", color="#D8E4EE", size=12),
+    )
+    return fig
+
+def get_archetype_icon(name):
+    n = name.lower()
+    if "disciplined" in n or "saver"   in n: return "💎"
+    if "impulsive"   in n or "spender" in n: return "🔥"
+    if "foodie"      in n:                   return "🍜"
+    if "social"      in n:                   return "🎉"
+    if "balanced"    in n:                   return "⚖️"
+    return "💰"
+
 def show_upload_prompt(module_name, accent):
     components.html(f"""
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -330,8 +430,6 @@ def show_upload_prompt(module_name, accent):
     </div>
     """, height=360)
 
-
-# ── HOME LANDING ──────────────────────────────────────────────
 def show_landing():
     components.html("""
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet">
@@ -399,91 +497,14 @@ def show_landing():
     """, height=540)
 
 
-# ── CACHED ANALYSIS ───────────────────────────────────────────
-@st.cache_data(show_spinner=False)
-def run_analysis(file_bytes, filename):
-    file_obj         = io.BytesIO(file_bytes)
-    file_obj.name    = filename
-    df, error        = load_csv(file_obj)
-    if error:
-        return None, error
-    df               = preprocess(df)
-    spending_profile = get_spending_profile(df)
-    personality      = get_personality(spending_profile)
-    daily_df         = get_daily_spending(df)
-    summary          = get_summary(df)
-    current_balance  = float(df["balance"].iloc[-1])
-    crisis           = predict_crisis(daily_df, current_balance)
-    story            = get_story(df, spending_profile, crisis, personality["name"])
-    return {
-        "df":               df,
-        "spending_profile": spending_profile,
-        "personality":      personality,
-        "crisis":           crisis,
-        "story":            story,
-        "summary":          summary,
-        "current_balance":  current_balance,
-    }, None
-
-
-# ── PLOTLY DARK THEME ─────────────────────────────────────────
-def dark_chart(fig):
-    fig.update_layout(
-        paper_bgcolor="#05080A", plot_bgcolor="#0B0F13",
-        font=dict(family="IBM Plex Mono, monospace", color="#7A9AAA", size=10),
-        xaxis=dict(gridcolor="#182028", zerolinecolor="#182028",
-                   tickfont=dict(color="#7A9AAA"), linecolor="#182028"),
-        yaxis=dict(gridcolor="#182028", zerolinecolor="#182028",
-                   tickfont=dict(color="#7A9AAA"), linecolor="#182028"),
-        margin=dict(l=40, r=20, t=45, b=35),
-        title_font=dict(family="IBM Plex Mono, monospace", color="#D8E4EE", size=12),
-    )
-    return fig
-
-
-# ── ARCHETYPE ICON ────────────────────────────────────────────
-def get_archetype_icon(name):
-    n = name.lower()
-    if "disciplined" in n or "saver"   in n: return "💎"
-    if "impulsive"   in n or "spender" in n: return "🔥"
-    if "foodie"      in n:                   return "🍜"
-    if "social"      in n:                   return "🎉"
-    if "balanced"    in n:                   return "⚖️"
-    return "💰"
-
-
 # ════════════════════════════════════════════════════════════
 # PAGE: HOME
 # ════════════════════════════════════════════════════════════
 if page == "HOME":
-    if uploaded_file is None:
+    if not has_analysis:
         show_landing()
     else:
-        progress_bar = st.progress(0)
-        status       = st.empty()
-
-        def set_status(pct, msg):
-            progress_bar.progress(pct)
-            status.markdown(
-                f"<div style='font-family:IBM Plex Mono,monospace;font-size:0.68rem;"
-                f"color:#7A9AAA;letter-spacing:2px;padding:0.2rem 0;'>"
-                f"<span style='color:#C8FF00;'>▶</span>&nbsp;{msg}</div>",
-                unsafe_allow_html=True
-            )
-
-        set_status(20, "LOADING & PREPROCESSING...")
-        time.sleep(0.1)
-        set_status(55, "RUNNING ALL 3 MODULES...")
-        results, error = run_analysis(uploaded_file.read(), uploaded_file.name)
-        if error:
-            st.error(f"❌ {error}")
-            st.stop()
-        set_status(100, "ANALYSIS COMPLETE")
-        time.sleep(0.25)
-        progress_bar.empty()
-        status.empty()
-
-        r               = results
+        r               = st.session_state.analysis
         personality     = r["personality"]
         crisis          = r["crisis"]
         story           = r["story"]
@@ -501,7 +522,6 @@ if page == "HOME":
                            if safe else
                            f"Balance depletes in {days} day(s). Reduce daily burn immediately.")
 
-        # Snapshot strip
         components.html("""
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
         <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;
@@ -590,12 +610,11 @@ if page == "HOME":
 # PAGE: PERSONALITY
 # ════════════════════════════════════════════════════════════
 elif page == "PERSONALITY":
-    if uploaded_file is None:
+    if not has_analysis:
         show_upload_prompt("PERSONALITY PROFILER", "#C8FF00")
     else:
-        results, error = run_analysis(uploaded_file.read(), uploaded_file.name)
-        if error: st.error(f"❌ {error}"); st.stop()
-        personality = results["personality"]
+        r           = st.session_state.analysis
+        personality = r["personality"]
         arch_icon   = get_archetype_icon(personality["name"])
         arch_name   = personality["name"]
 
@@ -650,13 +669,12 @@ elif page == "PERSONALITY":
 # PAGE: CRISIS RADAR
 # ════════════════════════════════════════════════════════════
 elif page == "CRISIS RADAR":
-    if uploaded_file is None:
+    if not has_analysis:
         show_upload_prompt("CRISIS RADAR", "#FFB300")
     else:
-        results, error  = run_analysis(uploaded_file.read(), uploaded_file.name)
-        if error: st.error(f"❌ {error}"); st.stop()
-        crisis          = results["crisis"]
-        current_balance = results["current_balance"]
+        r               = st.session_state.analysis
+        crisis          = r["crisis"]
+        current_balance = r["current_balance"]
 
         components.html("""
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -701,12 +719,11 @@ elif page == "CRISIS RADAR":
 # PAGE: MONEY STORY
 # ════════════════════════════════════════════════════════════
 elif page == "MONEY STORY":
-    if uploaded_file is None:
+    if not has_analysis:
         show_upload_prompt("MONEY STORY", "#3D8BFF")
     else:
-        results, error = run_analysis(uploaded_file.read(), uploaded_file.name)
-        if error: st.error(f"❌ {error}"); st.stop()
-        story          = results["story"]
+        r     = st.session_state.analysis
+        story = r["story"]
 
         components.html("""
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
