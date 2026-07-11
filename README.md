@@ -1,133 +1,84 @@
-# 💰 RupeeIQ
+# RupeeIQ — Personal Finance Intelligence for Indian Students
 
-> **Personal Finance Intelligence System for Indian Students**  
-> Know Your Money. Know Yourself.
+**Upload a transaction CSV, get back a financial personality profile, a budget-crisis forecast, and a plain-language money story — three self-contained ML/NLP modules, zero external AI APIs.**
 
-![Python](https://img.shields.io/badge/Python-3.11.9-blue?style=flat-square&logo=python)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.57-FF4B4B?style=flat-square&logo=streamlit)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.8-orange?style=flat-square&logo=scikit-learn)
-![Plotly](https://img.shields.io/badge/Plotly-6.7-3F4F75?style=flat-square&logo=plotly)
+🔗 **Live:** [rupeeiq-sjphk5ivzblxabz4uxbdvv.streamlit.app](https://rupeeiq-sjphk5ivzblxabz4uxbdvv.streamlit.app)
+📦 **Source:** [github.com/vishvrajsolanki-dev/rupeeiq](https://github.com/vishvrajsolanki-dev/rupeeiq)
 
 ---
 
-## What is RupeeIQ?
+## What It Does
 
-RupeeIQ is a Streamlit web app that takes your bank transaction CSV and runs it through three AI-powered modules to deliver a complete financial intelligence report — your spending personality, a budget crisis forecast, and a personal money narrative.
+Most students never see their own spending as data — just raw bank statements. RupeeIQ takes a transaction CSV and turns it into three distinct, personalised insights:
 
-Built for Indian college students. Understands Swiggy, Zomato, Ola, rent, salary credits, and the chaotic reality of student finances.
+1. **Financial Personality Profiler** — classifies you into one of 5 archetypes (Disciplined Saver, Impulsive Spender, The Foodie, Social Butterfly, Balanced Spender) with a radar chart, category breakdown, and a personalised tip
+2. **Budget Crisis Predictor** — fits a burn-rate trend to your spending and projects your zero-balance date, with a rule-based recovery plan
+3. **Money Story Narrator** — detects 7 behavioural spending patterns (late-night spending, weekend spikes, no-savings behaviour, etc.) and writes a plain-language narrative summary
 
----
+Built solo, from a blank project directory to a live deployed product, in a few days.
 
-## Modules
+## Why It's Not "Another OpenAI Wrapper"
 
-### 🧠 Module 01 — Financial Personality Profiler
-Matches your spending profile against 5 archetypes using Euclidean distance:
+Every module runs **entirely locally** — no external LLM or AI API calls anywhere in the intelligence layer. Personality classification, crisis prediction, and narrative generation are all custom-built:
 
-| Archetype | Description |
+- **Personality classifier:** Euclidean distance to manually defined archetype centroid vectors — deliberately *not* K-Means (see below)
+- **Crisis predictor:** `scikit-learn` `LinearRegression` on the daily spending time series
+- **Story narrator:** rule-based NLP pattern detection across 7 behavioural signals
+
+## The K-Means Pivot — the Actual Engineering Story
+
+The first version of the personality profiler used K-Means clustering. It broke immediately: `ValueError: n_samples=1 should be >= n_clusters=5`. K-Means is a clustering algorithm for finding groups across many samples — it's structurally the wrong tool for classifying a *single* uploaded CSV against fixed categories.
+
+The fix: define 5 archetype centroids as fixed vectors of spending percentages across categories, then classify the user by Euclidean distance to the nearest one. This is deterministic, always valid for a single sample, and more interpretable than a black-box cluster assignment — recognizing *why* K-Means failed and replacing it with the right tool, rather than forcing more data at it, is the actual signal here.
+
+## Architecture
+
+Single-file Streamlit app (`app.py`) backed by a modular, independently-testable Python package — each of the three analytical modules is fully decoupled from the UI layer.
+
+**UI rendering:** Streamlit 1.57's `st.markdown` had a version-specific bug where triple-quoted HTML rendered as raw text instead of parsed HTML. Fixed by routing all complex UI blocks through `components.html()` (iframe-rendered, immune to the markdown parser) — this became a project-wide rule.
+
+**State management:** Four-page router (`HOME`, `PERSONALITY`, `CRISIS RADAR`, `MONEY STORY`) via `st.session_state`, with all three analysis modules cached via `@st.cache_data` keyed on file bytes — meaning navigating between pages triggers **zero recomputation**.
+
+**Design system:** Bloomberg Terminal × Indian street poster aesthetic — `IBM Plex Mono` for data readouts, `Bebas Neue` for display numbers, `DM Sans` for body text, an acid-green/cyan/amber palette, and a CSS scanline texture overlay.
+
+## The Hardest Bug: Cross-Page Data Loss
+
+The most persistent bug in the build. Each page originally called `uploaded_file.read()` independently — but `.read()` exhausts the file's buffer on first call, so every subsequent page got empty bytes back. Three iterations to actually fix it:
+
+1. Store the file *object* in session state — buffer still exhausted, same failure
+2. An "anchor file" pattern (via AI-assisted coding) added an `else` branch that cleared the stored file whenever `uploaded_file` returned `None` — which it does on *every* navigation rerun, silently wiping the data again
+3. **Final fix:** call `uploaded_file.getvalue()` immediately on upload, store the raw bytes (not the file object) in session state, and remove the `else` branch entirely — bytes in session state survive reruns; file objects don't
+
+Understanding *why* each attempt failed required reasoning about Streamlit's actual rerun execution model, not just pattern-matching a fix.
+
+## Other Real Bugs, Real Fixes
+
+- **Savings detection always `False`** — salary credits were being classified under the "Savings" category, making the raw amount always positive. Fixed by switching to a ratio check (savings < 5% of total spend).
+- **Unrealistic synthetic data** — the first data generator produced ₹3L+ in "Rent" over 3 months. Rebuilt with a `CATEGORY_BLUEPRINT` defining realistic per-category frequency and amount ranges.
+- **Windows encoding crash** — the ₹ symbol broke on Windows CMD (`cp1252` decode error). Fixed with explicit UTF-8 encoding and Rs. fallback in f-strings.
+- **Deployment dependency conflict** — Streamlit Cloud's Python 3.14 runtime broke on a pinned `numpy` version incompatible with `pandas`. Fixed by removing the pin and letting the resolver pick a compatible transitive version.
+
+## Results
+
+| Metric | Result |
 |---|---|
-| 💎 Disciplined Saver | Consistently low spend across all categories |
-| 🔥 Impulsive Spender | High variance, frequent impulse purchases |
-| 🍜 The Foodie | Disproportionate food & delivery spend |
-| 🎉 Social Butterfly | Entertainment and outing-heavy profile |
-| ⚖️ Balanced Spender | Even distribution across all categories |
-
-Output: archetype name, radar chart, bar chart, and a personalised tip.
-
-### 🚨 Module 02 — Budget Crisis Predictor
-Runs linear regression on your daily spending trend to forecast when your balance hits zero. Returns:
-- Days remaining before crisis
-- Average daily burn rate
-- Crisis date
-- Recovery plan (rule-based)
-
-### 📖 Module 03 — Money Story Narrator
-Detects 7 behavioural patterns from your transactions and generates a personalised narrative:
-- Late night spending habits
-- Weekend spending spikes
-- Food-heavy allocation
-- Impulse shopping signals
-- No savings behaviour
-- Health spend neglect
-- Education investment
-
----
+| ML/NLP modules | 3, fully integrated and deployed |
+| Financial archetypes | 5, with tuned centroid vectors + radar visualization |
+| Behavioural patterns detected | 7, rule-based |
+| Synthetic dataset | ~155 realistic transactions across 3 months, 10 categories |
+| Bugs resolved | 8 total, 3 requiring architectural changes |
+| External AI API calls | 0 |
+| Build time | A few days, solo, blank repo → live deployment |
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| UI | Streamlit 1.57 + `components.html()` |
-| Data | Pandas 3.0.2, NumPy 1.26.4 |
-| ML | Scikit-learn 1.8 (LinearRegression, Euclidean distance) |
-| Charts | Plotly 6.7 (dark terminal theme) |
-| NLP | Rule-based pattern engine (no LLM dependency) |
-| Fonts | IBM Plex Mono · Bebas Neue · DM Sans |
+Python · Streamlit · scikit-learn (LinearRegression) · Pandas · NumPy · Plotly · NLTK · Euclidean distance classifier · Rule-based NLP · Streamlit Cloud
+
+## Notes
+
+- Tested against synthetic Indian-student transaction data; not yet validated against real bank export formats (HDFC/SBI/ICICI).
+- Layout built and tested for desktop; mobile rendering on Streamlit Cloud is unconfirmed.
 
 ---
 
-## Installation
-
-```bash
-git clone https://github.com/vishvrajsolanki-dev/rupeeiq.git
-cd rupeeiq
-pip install -r requirements.txt
-```
-
-Generate the sample dataset:
-```bash
-python data/synthetic_generator.py
-```
-
-Run the app:
-```bash
-streamlit run app.py
-```
-
----
-
-## CSV Format
-
-Your transaction CSV must have these columns:
-
-| Column | Type | Example |
-|---|---|---|
-| `date` | string / datetime | `2024-01-15` |
-| `description` | string | `Swiggy Order` |
-| `amount` | float | `245.0` |
-| `category` | string | `Food` |
-| `balance` | float | `8450.0` |
-| `type` | string | `debit` / `credit` |
-
-A sample CSV (`data/sample_transactions.csv`) is available for download inside the app sidebar.
-
----
-
-## Project Structure
-
-```
-rupeeiq/
-├── app.py                      # Main Streamlit UI
-├── requirements.txt
-├── data/
-│   └── synthetic_generator.py  # Realistic Indian transaction generator
-├── modules/
-│   ├── personality_profiler.py # M1 — Euclidean archetype matching
-│   ├── crisis_predictor.py     # M2 — Linear regression forecast
-│   └── story_narrator.py       # M3 — Rule-based narrative engine
-└── utils/
-    ├── data_loader.py          # CSV loader + validator
-    └── preprocessor.py         # Feature engineering + aggregations
-```
-
----
-
-## Deployment
-
-Live on Streamlit Cloud: **https://rupeeiq-sjphk5ivzblxabz4uxbdvv.streamlit.app**
-
----
-
-## Author
-
-**Vishvrajsinh Solanki**  
-[@vishvrajsolanki-dev](https://github.com/vishvrajsolanki-dev)
+*Built by [Vishvrajsinh Solanki](https://github.com/vishvrajsolanki-dev) — end-to-end ML product ownership: synthetic data generation, model design, custom UI, deployment, and debugging, solo.*
